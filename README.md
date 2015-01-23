@@ -39,7 +39,7 @@ Open Redmine in the browser:
 
 **Linux**
 
-    $ open http://localhost:8080
+    $ xdg-open http://localhost:8080
 
 **Boot2Docker**
 
