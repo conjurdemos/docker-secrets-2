@@ -50,12 +50,55 @@ Shut down Redmine with `Ctrl-C`.
 Load the policy file:
 
     $ conjur policy load -c policy.json policy.rb
+    
+Store data from the policy file in shell variables:
 
+    $ policy_id=`cat policy.json | jsonfield policy`
+    $ host_id=$policy_id/container/0
+    $ host_api_key=`cat policy.json | ruby -rjson -e "puts JSON.parse(STDIN.read)['api_keys'].values[0]"`
+    
 Run the secure Redmine:
 
-    $ docker run -it --rm -e POLICY_ID=`cat policy.json | jsonfield policy` \
+    $ docker run -it --rm \
+      -e POLICY_ID=$policy_id \
+      -e CONJUR_AUTHN_LOGIN=host/$host_id \
+      -e CONJUR_AUTHN_API_KEY=$host_api_key \
       -e CONJUR_ACCOUNT=dev \
       -e CONJUR_APPLIANCE_URL=https://conjur-dev.conjur.net/api \
       -e DB_HOST=$mysql_host \
       -p 8080:80 \
       conjur-redmine-conjurenv
+
+The startup script in this container will use `conjur env check` to verify that all required secrets:
+
+1) Are populated with a value
+2) Can be fetched by the container`
+
+At this point, the database password has not yet been stored in Conjur, so the Redmine container will print
+an error and exit.
+
+Load the password into Conjur:
+
+    $ conjur variable values add $policy_id/db-password ZemuBRAXu2tadr
+
+Now, run Redmine again:
+
+    $ docker run -it --rm \
+      -e POLICY_ID=$policy_id \
+      -e CONJUR_AUTHN_LOGIN=host/$host_id \
+      -e CONJUR_AUTHN_API_KEY=$host_api_key \
+      -e CONJUR_ACCOUNT=dev \
+      -e CONJUR_APPLIANCE_URL=https://conjur-dev.conjur.net/api \
+      -e DB_HOST=$mysql_host \
+      -p 8080:80 \
+      conjur-redmine-conjurenv
+
+This time, it will start successfully and connect to the database. You can refresh the Redmine
+application in your browser, and see that it's running.
+
+Conjur records a detailed audit of system activity. For example, you can print all the events
+related to the database password:
+
+    $ conjur audit resource -s variable:$policy_id/db-password
+    [2015-01-23 17:51:12 UTC] dev:user:kgilpin checked that they can execute dev:variable:kgilpin@spudling-2.local/docker-secrets-redmine-1.0/db-password (true)
+    [2015-01-23 19:52:25 UTC] dev:host:kgilpin@spudling-2.local/docker-secrets-redmine-1.0/container/0 checked that they can execute dev:variable:kgilpin@spudling-2.local/docker-secrets-redmine-1.0/db-password (true)
