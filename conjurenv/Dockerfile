@@ -1,8 +1,14 @@
-FROM ruby:2.0
+FROM sameersbn/redmine:2.6.1
 
-RUN curl -o /tmp/conjur.deb https://s3.amazonaws.com/conjur-releases/omnibus/conjur_4.18.0-1_amd64.deb && dpkg -i /tmp/conjur.deb
+RUN wget -q https://s3.amazonaws.com/conjur-releases/omnibus/conjur_4.18.6-1_amd64.deb -O /tmp/conjur.deb && dpkg -i /tmp/conjur.deb && rm /tmp/conjur.deb
 
 ADD app.secrets /app.secrets
-ADD app.rb /app.rb
+ADD start /start
+RUN chmod a+x /start
 
-ENTRYPOINT [ "/opt/conjur/bin/conjur", "env", "run", "-c", "/app.secrets", "--", "ruby", "/app.rb" ]
+ENV DB_TYPE mysql
+ENV DB_PORT 3306
+ENV DB_NAME redmine_production
+ENV DB_USER redmine
+
+ENTRYPOINT [ "/start" ]

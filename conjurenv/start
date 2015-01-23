@@ -1,0 +1,6 @@
+#!/bin/bash -e
+
+PATH=/opt/conjur/bin:$PATH
+
+conjur env check --policy $POLICY_ID -c /app.secrets
+conjur env run --policy $POLICY_ID -c /app.secrets -- /app/init app:start

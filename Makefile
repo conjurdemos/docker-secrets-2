@@ -1,12 +1,12 @@
-.PHONY: all insecure env conjurenv
+.PHONY: all database insecure conjurenv
 
-all: insecure env conjurenv
+all: database insecure conjurenv
+
+database:
+	docker build -t conjur-redmine-db database
 
 insecure:
-	docker build -t conjur-secrets-demo-insecure insecure
-
-env:
-	docker build -t conjur-secrets-demo-env env
+	docker build -t conjur-redmine-insecure insecure
 
 conjurenv:
-	docker build -t conjur-secrets-demo-conjurenv conjurenv
+	docker build -t conjur-redmine-conjurenv conjurenv
