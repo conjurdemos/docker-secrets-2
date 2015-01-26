@@ -49,7 +49,7 @@ Shut down Redmine with `Ctrl-C`.
 
 Load the policy file:
 
-    $ conjur policy load -c policy.json policy.rb
+    $ CONJURAPI_LOG=stderr conjur policy load -c policy.json policy.rb
     
 Store data from the policy file in shell variables:
 
