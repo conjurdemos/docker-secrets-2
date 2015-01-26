@@ -33,7 +33,7 @@ Obtain the database hostname:
 
 Run the insecure Redmine application:
 
-    $ docker run -it --rm -e DB_HOST=$mysql_host -p 8080:80 redmine-insecure
+    $ docker run -it --rm -e DB_HOST=$mysql_host -p 8080:80 conjur-redmine-insecure
     
 Open Redmine in the browser:
 
