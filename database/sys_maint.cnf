@@ -1,0 +1,13 @@
+[client]
+port    = 3306
+socket    = /var/run/mysqld/mysqld.sock
+host     = localhost
+user     = sys-maint
+password = 
+
+[mysql_upgrade]
+host     = localhost
+user     = sys-maint
+password = 
+socket   = /var/run/mysqld/mysqld.sock
+basedir  = /usr
