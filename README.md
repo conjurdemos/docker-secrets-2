@@ -46,21 +46,18 @@ Shut down Redmine with `Ctrl-C`.
 Load the policy file:
 
     $ CONJURAPI_LOG=stderr conjur policy load -c policy.json policy.rb
-    
-Store data from the policy file in shell variables:
+
+`conjurize` the host:
 
     $ policy_id=`cat policy.json | jsonfield policy`
-    $ host_id=$policy_id/container/0
-    $ host_api_key=`cat policy.json | ruby -rjson -e "puts JSON.parse(STDIN.read)['api_keys'].values[0]"`
-    
+    $ conjur host create $policy_id/docker/secure | tee host.json | conjurize > conjurize.sh
+    $ conjur layer hosts add $policy_id/redmine $policy_id/docker/secure
+
 Run the secure Redmine:
 
     $ docker run -it --rm \
+      -v $PWD/conjurize.sh:/conjurize.sh \
       -e POLICY_ID=$policy_id \
-      -e CONJUR_AUTHN_LOGIN=host/$host_id \
-      -e CONJUR_AUTHN_API_KEY=$host_api_key \
-      -e CONJUR_ACCOUNT=dev \
-      -e CONJUR_APPLIANCE_URL=https://conjur.example.com/api \
       -e DB_HOST=$mysql_host \
       -p 8080:80 \
       conjurdemos/docker-secrets-2-secure
@@ -80,11 +77,8 @@ Load the password into Conjur:
 Now, run Redmine again:
 
     $ docker run -it --rm \
+      -v $PWD/conjurize.sh:/conjurize.sh \
       -e POLICY_ID=$policy_id \
-      -e CONJUR_AUTHN_LOGIN=host/$host_id \
-      -e CONJUR_AUTHN_API_KEY=$host_api_key \
-      -e CONJUR_ACCOUNT=dev \
-      -e CONJUR_APPLIANCE_URL=https://conjur.example.com/api \
       -e DB_HOST=$mysql_host \
       -p 8080:80 \
       conjurdemos/docker-secrets-2-secure

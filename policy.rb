@@ -7,11 +7,7 @@ policy "docker-secrets-redmine-1.0" do
     end
   end
   
-  container = host "container/0"
-  
   layer "redmine" do
-    add_host container
-    
     can "execute", password
   end
 end

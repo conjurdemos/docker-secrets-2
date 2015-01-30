@@ -2,5 +2,6 @@
 
 PATH=/opt/conjur/bin:$PATH
 
+source /conjurize.sh
 conjur env check --policy $POLICY_ID -c /app.secrets
 conjur env run --policy $POLICY_ID -c /app.secrets -- /app/init app:start
