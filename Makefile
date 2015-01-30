@@ -1,12 +1,14 @@
-.PHONY: all database insecure conjurenv
+.PHONY: images
 
-all: database insecure conjurenv
+images: database.image insecure.image secure.image
 
-database:
-	docker build -t conjur-redmine-db database
+database.image : NAME = conjurdemos/docker-secrets-2-db
 
-insecure:
-	docker build -t conjur-redmine-insecure insecure
+insecure.image : NAME = conjurdemos/docker-secrets-2-insecure
 
-conjurenv:
-	docker build -t conjur-redmine-conjurenv conjurenv
+secure.image : NAME = conjurdemos/docker-secrets-2-secure
+
+%.image: %/Dockerfile %/*
+	docker build -t $(NAME) $*
+	docker push $(NAME)
+	docker inspect -f '{{.Id}}' $(NAME) > $@

@@ -5,35 +5,31 @@ to an application running in Docker.
 
 # Docker Images
 
-## conjur-redmine-db
+## docker-secrets-2-db
 
 A MySQL database. 
 
-## conjur-redmine-insecure
+## docker-secrets-2-insecure
 
 The Redmine application, with the database password hard-coded into the Dockerfile.
 
-## conjur-redmine-conjurenv
+## docker-secrets-2-secure
 
 The Redmine application, with the database password provided by [conjur env run](http://developer.conjur.net/reference/tools/conjurenv/run.html).
 
-# Running The Demo
-
-Build the images:
-
-    $ make
+# Running the Demo
 
 Run the database container:
 
-    $ docker run --name=conjur-redmine-db -d conjur-redmine-db
+    $ docker run --name=docker-secrets-2-db -d conjurdemos/docker-secrets-2-db
 
 Obtain the database hostname:
 
-    $ mysql_host=`docker inspect conjur-redmine-db | grep IPAddress | cut -d '"' -f 4`
+    $ mysql_host=`docker inspect docker-secrets-2-db | grep IPAddress | cut -d '"' -f 4`
 
 Run the insecure Redmine application:
 
-    $ docker run -it --rm -e DB_HOST=$mysql_host -p 8080:80 conjur-redmine-insecure
+    $ docker run -it --rm -e DB_HOST=$mysql_host -p 8080:80 conjurdemos/docker-secrets-2-insecure
     
 Open Redmine in the browser:
 
@@ -64,10 +60,10 @@ Run the secure Redmine:
       -e CONJUR_AUTHN_LOGIN=host/$host_id \
       -e CONJUR_AUTHN_API_KEY=$host_api_key \
       -e CONJUR_ACCOUNT=dev \
-      -e CONJUR_APPLIANCE_URL=https://conjur-dev.conjur.net/api \
+      -e CONJUR_APPLIANCE_URL=https://conjur.example.com/api \
       -e DB_HOST=$mysql_host \
       -p 8080:80 \
-      conjur-redmine-conjurenv
+      conjurdemos/docker-secrets-2-secure
 
 The startup script in this container will use `conjur env check` to verify that all required secrets:
 
@@ -88,10 +84,10 @@ Now, run Redmine again:
       -e CONJUR_AUTHN_LOGIN=host/$host_id \
       -e CONJUR_AUTHN_API_KEY=$host_api_key \
       -e CONJUR_ACCOUNT=dev \
-      -e CONJUR_APPLIANCE_URL=https://conjur-dev.conjur.net/api \
+      -e CONJUR_APPLIANCE_URL=https://conjur.example.com/api \
       -e DB_HOST=$mysql_host \
       -p 8080:80 \
-      conjur-redmine-conjurenv
+      conjurdemos/docker-secrets-2-secure
 
 This time, it will start successfully and connect to the database. You can refresh the Redmine
 application in your browser, and see that it's running.
@@ -102,3 +98,9 @@ related to the database password:
     $ conjur audit resource -s variable:$policy_id/db-password
     [2015-01-23 17:51:12 UTC] dev:user:kgilpin checked that they can execute dev:variable:kgilpin@spudling-2.local/docker-secrets-redmine-1.0/db-password (true)
     [2015-01-23 19:52:25 UTC] dev:host:kgilpin@spudling-2.local/docker-secrets-redmine-1.0/container/0 checked that they can execute dev:variable:kgilpin@spudling-2.local/docker-secrets-redmine-1.0/db-password (true)
+
+# Build
+
+Build and push the images:
+
+    $ make
