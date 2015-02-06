@@ -6,6 +6,7 @@ RUN apk update && \
 
 ADD sys_maint.cnf /etc/mysql/sys_maint.cnf
 ADD my.cnf /etc/mysql/my.cnf
+ADD redmine_production.dump /redmine_production.dump
 ADD start /start
 RUN chmod 755 /start
 

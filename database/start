@@ -87,6 +87,7 @@ if [ -n "${DB_USER}" -o -n "${DB_NAME}" ]; then
         fi
       done
   fi
+  mysql --defaults-file=/etc/mysql/sys_maint.cnf redmine_production < redmine_production.dump
   /usr/bin/mysqladmin --defaults-file=/etc/mysql/sys_maint.cnf shutdown
 fi
 

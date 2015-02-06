@@ -1,13 +1,13 @@
 # Conjur Secrets Demo
 
-This demo shows how to securely provide infrastructure secrets (in this case, a database password), 
-to an application running in Docker. 
+This demo shows how to securely provide infrastructure secrets (in this case, a database password),
+to an application running in Docker.
 
 # Docker Images
 
 ## docker-secrets-2-db
 
-A MySQL database. 
+A MySQL database.
 
 ## docker-secrets-2-insecure
 
@@ -30,16 +30,16 @@ Obtain the database hostname:
 Run the insecure Redmine application:
 
     $ docker run -it --rm -e DB_HOST=$mysql_host -p 8080:80 conjurdemos/docker-secrets-2-insecure
-    
+
 Open Redmine in the browser:
 
 **Linux**
 
-    $ xdg-open http://localhost:8080
+    $ xdg-open http://localhost:8080/projects/conjur-secrets-demo/issues
 
 **Boot2Docker**
 
-    $ open http://$(boot2docker ip):8080
+    $ open http://$(boot2docker ip):8080/projects/conjur-secrets-demo/issues
 
 Shut down Redmine with `Ctrl-C`.
 
