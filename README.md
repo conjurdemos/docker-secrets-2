@@ -53,6 +53,10 @@ Load the policy file:
     $ conjur host create $policy_id/docker/secure | tee host.json | conjurize > conjurize.sh
     $ conjur layer hosts add $policy_id/redmine $policy_id/docker/secure
 
+Load the password into Conjur:
+
+    $ conjur variable values add $policy_id/db-password ZemuBRAXu2tadr
+
 Run the secure Redmine:
 
     $ docker run -it --rm \
@@ -67,23 +71,7 @@ The startup script in this container will use `conjur env check` to verify that 
 1) Are populated with a value
 2) Can be fetched by the container`
 
-At this point, the database password has not yet been stored in Conjur, so the Redmine container will print
-an error and exit.
-
-Load the password into Conjur:
-
-    $ conjur variable values add $policy_id/db-password ZemuBRAXu2tadr
-
-Now, run Redmine again:
-
-    $ docker run -it --rm \
-      -v $PWD/conjurize.sh:/conjurize.sh \
-      -e POLICY_ID=$policy_id \
-      -e DB_HOST=$mysql_host \
-      -p 8080:80 \
-      conjurdemos/docker-secrets-2-secure
-
-This time, it will start successfully and connect to the database. You can refresh the Redmine
+Again, it will start successfully and connect to the database. You can refresh the Redmine
 application in your browser, and see that it's running.
 
 Conjur records a detailed audit of system activity. For example, you can print all the events
@@ -93,7 +81,11 @@ related to the database password:
     [2015-01-23 17:51:12 UTC] dev:user:kgilpin checked that they can execute dev:variable:kgilpin@spudling-2.local/docker-secrets-redmine-1.0/db-password (true)
     [2015-01-23 19:52:25 UTC] dev:host:kgilpin@spudling-2.local/docker-secrets-redmine-1.0/container/0 checked that they can execute dev:variable:kgilpin@spudling-2.local/docker-secrets-redmine-1.0/db-password (true)
 
-# Build
+---
+
+# Development
+
+## Build
 
 Build and push the images:
 
